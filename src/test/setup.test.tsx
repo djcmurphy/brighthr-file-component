@@ -48,6 +48,30 @@ describe("DocumentTable", () => {
         screen.queryByText(fileOutsideFolder!.name),
       ).not.toBeInTheDocument();
     });
+
+    it("navigates back to parent folder", async () => {
+      const user = userEvent.setup();
+
+      // Navigate into a folder first
+      const folderToClick = mockFiles.find(
+        (f) => f.name === "Expenses",
+      ) as Folder;
+      await user.click(
+        screen.getByLabelText(`Open folder ${folderToClick.name}`),
+      );
+
+      // Verify we're in the folder
+      expect(screen.getByText(folderToClick.files[0].name)).toBeInTheDocument();
+
+      // Navigate back
+      await user.click(screen.getByLabelText("Navigate back to root folder"));
+
+      // Verify we're back to root
+      expect(screen.getByText("Employee Handbook")).toBeInTheDocument();
+      expect(
+        screen.queryByText(folderToClick.files[0].name),
+      ).not.toBeInTheDocument();
+    });
   });
 
   describe("Sorting", () => {
@@ -73,6 +97,61 @@ describe("DocumentTable", () => {
 
       await user.click(nameSortButton);
       expect(getVisibleNames()).toEqual(defaultSortedNames);
+    });
+  });
+
+  describe("Filtering", () => {
+    it("filters files by name", async () => {
+      const user = userEvent.setup();
+      const filterInput = screen.getByLabelText("Filter documents by name");
+
+      await user.type(filterInput, "Employee");
+
+      const visibleNames = getVisibleNames();
+      expect(visibleNames).toHaveLength(1);
+      expect(visibleNames[0]).toBe("Employee Handbook");
+    });
+
+    it("shows no results for non-matching filter", async () => {
+      const user = userEvent.setup();
+      const filterInput = screen.getByLabelText("Filter documents by name");
+
+      await user.type(filterInput, "nonexistent");
+
+      const visibleNames = getVisibleNames();
+      expect(visibleNames).toHaveLength(0);
+    });
+
+    it("clears filter when input is cleared", async () => {
+      const user = userEvent.setup();
+      const filterInput = screen.getByLabelText("Filter documents by name");
+
+      await user.type(filterInput, "Employee");
+      expect(getVisibleNames()).toHaveLength(1);
+
+      await user.clear(filterInput);
+      expect(getVisibleNames()).toHaveLength(mockFiles.length);
+    });
+
+    it("filters correctly when inside a folder", async () => {
+      const user = userEvent.setup();
+      const filterInput = screen.getByLabelText("Filter documents by name");
+
+      // Navigate into a folder first
+      const folderToClick = mockFiles.find(
+        (f) => f.name === "Expenses",
+      ) as Folder;
+      await user.click(
+        screen.getByLabelText(`Open folder ${folderToClick.name}`),
+      );
+
+      // Now filter within the folder - use a term that matches one of the files
+      const fileToFind = folderToClick.files[0];
+      const searchTerm = fileToFind.name.split(" ")[0]; // Use first word of filename
+      await user.type(filterInput, searchTerm);
+
+      const visibleNames = getVisibleNames();
+      expect(visibleNames).toContain(fileToFind.name);
     });
   });
 
