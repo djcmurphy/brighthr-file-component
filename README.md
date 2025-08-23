@@ -20,7 +20,7 @@ npm test
 
 ### Navigation
 
-- **Breadcrumb Navigation**: Given the ambiguity around the depth of the file data, I made the assumption that it could possibly be deeply nested. Currently the app allows nested folder navigation but lacks a breadcrumb trail to show the current path. A breadcrumb would help users understand where they are in the file structure and allow quick navigation back to parent folders. This could even be editable and allow users to jump directly to the desired folder.
+**Breadcrumb Navigation**: Given the ambiguity around the depth of the file data, I made the assumption that it could possibly be deeply nested. I've added a breadcrumb trail in the header to show the current path and allow quick navigation back to parent folders. For deeply nested paths, the breadcrumb would need enhancement to handle overflow - either by truncating middle segments with ellipsis (e.g., "Documents / ... / CurrentFolder") or collapsing folders into a dropdown menu. The breadcrumb could also be made editable to allow users to type and jump directly to a desired folder, although this would probably require it to be remvoed form the header into an input field.
 
 ### File Types & Icons
 
@@ -45,5 +45,3 @@ npm test
 - **Touch Optimization**: Current touch targets like the sort buttons are too small (24x24px) for mobile use. We'd need to increase these to at least 40x40px and replace hover states with touch-friendly interactions.
 
 - **Responsive Table Layout**: On mobile, we could keep the table but collapse all the information into a single cell per row. Each row would stack the file name, type, and date vertically within one `<td>`, maintaining the table structure while fitting narrow screens.
-
-- **Container Width Issues**: The fixed `min-w-[600px]` forces horizontal scrolling. We'd need to use percentage-based or viewport-relative widths with `overflow-x-auto` as a fallback for edge cases.

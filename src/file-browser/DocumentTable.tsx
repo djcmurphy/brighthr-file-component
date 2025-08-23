@@ -129,8 +129,9 @@ export default function DocumentTable() {
 
   return (
     <div className="min-h-[400px] min-w-[600px] rounded-md border-1 border-sky-600">
-      <div className="flex h-12 items-center gap-4 bg-sky-500 px-4 text-white">
-        <FileStack /> Documents
+      <div className="flex h-12 items-center gap-2 overflow-x-auto bg-sky-500 px-4 text-white">
+        <FileStack aria-hidden="true" />
+        <Breadcrumbs route={route} navigateToFolder={navigateToFolder} />
       </div>
       <div className="h-2" />
       <div className="p-2">
@@ -241,7 +242,49 @@ export default function DocumentTable() {
     </div>
   );
 }
-
+function Breadcrumbs({
+  route,
+  navigateToFolder,
+}: {
+  route: string[];
+  navigateToFolder: (path: string[]) => void;
+}) {
+  return (
+    <nav aria-label="Breadcrumb navigation">
+      <ol className="flex list-none items-center gap-2">
+        <li>
+          <button
+            onClick={() => navigateToFolder([])}
+            className="cursor-pointer px-1 hover:underline focus-visible:rounded focus-visible:outline-2 focus-visible:outline-white"
+            aria-label="Navigate to Documents root"
+            aria-current={route.length === 0 ? "page" : undefined}
+          >
+            Documents
+          </button>
+        </li>
+        {route.map((folder, index) => (
+          <li key={folder} className="flex items-center gap-2">
+            <span aria-hidden="true">/</span>
+            <button
+              onClick={() => navigateToFolder(route.slice(0, index + 1))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  navigateToFolder(route.slice(0, index + 1));
+                }
+              }}
+              className="cursor-pointer px-1 hover:underline focus-visible:rounded focus-visible:outline-2 focus-visible:outline-white"
+              aria-label={`Navigate to ${folder} folder`}
+              aria-current={index === route.length - 1 ? "page" : undefined}
+            >
+              {folder}
+            </button>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
 function SortButton({
   field,
   direction,
@@ -312,7 +355,7 @@ function FolderRow({
       <td className="px-4">
         <FolderIcon aria-hidden="true" />
       </td>
-      <td className="px-4">{folder.name}</td>
+      <td className="px-4 underline">{folder.name}</td>
       <td className="px-4"></td>
     </tr>
   );
