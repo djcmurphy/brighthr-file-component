@@ -39,6 +39,22 @@ export const mockFiles: FileOrFolder[] = [
         name: "Fuel allowances",
         added: "2017-05-03",
       },
+      {
+        type: "folder",
+        name: "Additional Expenses",
+        files: [
+          {
+            type: "doc",
+            name: "Expenses claim form",
+            added: "2017-05-02",
+          },
+          {
+            type: "doc",
+            name: "Fuel allowances",
+            added: "2017-05-03",
+          },
+        ],
+      },
     ],
   },
   {

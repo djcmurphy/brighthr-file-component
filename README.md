@@ -1,69 +1,51 @@
-# React + TypeScript + Vite
+# BrightHR File Browser Component
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React TypeScript application that displays a file and folder browser interface.
 
-Currently, two official plugins are available:
+## Installation
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Clone the repository
+2. Run `npm install`
+3. Run `npm run dev`
 
-## Expanding the ESLint configuration
+## Testing
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Run the tests with:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm test
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- View files and folders with file type, name, and date added
+- Click on folders to view contents
+- Sort by name or date
+- Filter by filename
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Avoided useEffect by handling all state changes through user interactions. Functions receive the current state as parameters rather than relying on previous state values in setState callbacks. With frequent data updates from sorting/filtering, useEffect would cause unnecessary re-renders.
+
+In a real app, you would most likely already have a table library that does a lot of these features, but for the sake of the demo I just implemented it manually.
+
+## Future Enhancements
+
+Given more time, I would implement:
+
+### Navigation
+
+- **Breadcrumb Navigation**: Currently the app allows nested folder navigation but lacks a breadcrumb trail to show the current path. This would help users understand where they are in the file structure and allow quick navigation back to parent folders.
+
+### File Types & Icons
+
+- **Dynamic File Type Support**: The current implementation has a limited set of file types. We would need to liaise with the backend team to get a comprehensive list of all supported file types and their associated metadata.
+- **Custom Icons**: Implement custom icons for different file types to improve visual recognition and user experience.
+
+### File Actions
+
+- **Action Dropdown/Pane**: Files would need a dropdown action button or a details pane to show file metadata and provide actions like download, delete, rename, or share.
+
+### Performance & Data Management
+
+- **Pagination**: For large file lists, we'd need pagination to keep things snappy.
+- **Data Updates**: We're not sure how the data will be updated (real-time, polling, manual refresh) which affects how we handle caching and memoization.
+- **Memoization**: While it can speed things up, memoization can also cause weird bugs if the data references aren't stable. We'd need to figure out if it's actually worth it based on how the data actually changes.

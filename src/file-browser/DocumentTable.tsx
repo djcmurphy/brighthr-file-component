@@ -110,7 +110,7 @@ export default function DocumentTable() {
     setNameFilter("");
   };
 
-  const handleSort = (field: SortField) => {
+  const sortByField = (field: SortField) => {
     let newDirection: SortDirection = "asc";
     if (currentSort.field === field) {
       if (currentSort.direction === "asc") {
@@ -150,7 +150,7 @@ export default function DocumentTable() {
                         ? currentSort.direction
                         : null
                     }
-                    onSort={handleSort}
+                    sortByField={sortByField}
                     ariaLabel={`Sort by name. Currently ${
                       currentSort.field === "name"
                         ? currentSort.direction === "asc"
@@ -171,7 +171,7 @@ export default function DocumentTable() {
                         ? currentSort.direction
                         : null
                     }
-                    onSort={handleSort}
+                    sortByField={sortByField}
                     ariaLabel={`Sort by date added. Currently ${
                       currentSort.field === "added"
                         ? currentSort.direction === "asc"
@@ -187,7 +187,9 @@ export default function DocumentTable() {
               <th className="h-12 w-20 max-w-20 min-w-20">
                 {route.length > 0 ? (
                   <button
-                    onClick={() => navigateToFolder([])}
+                    onClick={() =>
+                      navigateToFolder(route.slice(0, route.length - 1))
+                    }
                     aria-label="Navigate back to root folder"
                     className="flex h-8 w-full cursor-pointer items-center gap-2 rounded-md bg-sky-100 px-2 py-1 text-sm text-sky-600 hover:text-gray-700"
                   >
@@ -241,23 +243,23 @@ export default function DocumentTable() {
 function SortButton({
   field,
   direction,
-  onSort,
+  sortByField,
   ariaLabel: ariaLabel,
 }: {
   field: SortField;
   direction: SortDirection | null;
-  onSort: (field: SortField) => void;
+  sortByField: (field: SortField) => void;
   ariaLabel: string;
 }) {
   const inactiveClass =
     "bg-gray-50 text-gray-400 opacity-50  border-gray-500 hover:border-gray-800 hover:border-2";
   const activeClass = "bg-sky-600 text-white  opacity-100 border-white";
-  console;
+
   return (
     <button
       aria-label={ariaLabel}
       className={`flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border hover:border ${!direction ? inactiveClass : activeClass}`}
-      onClick={() => onSort(field)}
+      onClick={() => sortByField(field)}
     >
       {!direction ? (
         <ArrowUpDown size={14} />
