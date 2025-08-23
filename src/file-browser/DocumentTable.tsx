@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   FileStack,
   Folder as FolderIcon,
+  Search,
 } from "lucide-react";
 import dayjs from "dayjs";
 
@@ -133,13 +134,13 @@ export default function DocumentTable() {
       </div>
       <div className="h-2" />
       <div className="p-2">
-        <table className="w-full">
+        <table className="w-full" aria-label="Documents table">
           <thead>
             <tr className="h-12 border-b border-sky-600">
-              <th className="max-w-10 min-w-10">
+              <th scope="col" className="max-w-10 min-w-10">
                 <div className="flex items-center gap-2 pl-4">Type</div>
               </th>
-              <th className="">
+              <th scope="col">
                 <div className="flex items-center gap-2 pl-4">
                   Name
                   <SortButton
@@ -150,10 +151,17 @@ export default function DocumentTable() {
                         : null
                     }
                     onSort={handleSort}
+                    ariaLabel={`Sort by name. Currently ${
+                      currentSort.field === "name"
+                        ? currentSort.direction === "asc"
+                          ? "sorted ascending"
+                          : "sorted descending"
+                        : "not sorted"
+                    }`}
                   />
                 </div>
               </th>
-              <th className="">
+              <th scope="col">
                 <div className="flex items-center gap-2 pl-4">
                   Added
                   <SortButton
@@ -164,16 +172,24 @@ export default function DocumentTable() {
                         : null
                     }
                     onSort={handleSort}
+                    ariaLabel={`Sort by date added. Currently ${
+                      currentSort.field === "added"
+                        ? currentSort.direction === "asc"
+                          ? "sorted ascending"
+                          : "sorted descending"
+                        : "not sorted"
+                    }`}
                   />
                 </div>
               </th>
             </tr>
             <tr>
-              <th className="max-w-10 min-w-10">
+              <th className="h-12 w-20 max-w-20 min-w-20">
                 {route.length > 0 ? (
                   <button
                     onClick={() => navigateToFolder([])}
-                    className="text-small flex h-full w-full cursor-pointer items-center gap-2 rounded-none bg-gray-100 px-2 text-gray-500 hover:text-gray-700"
+                    aria-label="Navigate back to root folder"
+                    className="flex h-8 w-full cursor-pointer items-center gap-2 rounded-md bg-sky-100 px-2 py-1 text-sm text-sky-600 hover:text-gray-700"
                   >
                     <ChevronLeft size={16} />
                     Back
@@ -182,16 +198,21 @@ export default function DocumentTable() {
                   <></>
                 )}
               </th>
-              <th colSpan={2}>
-                <div className="flex items-center justify-between px-2 py-1">
+              <th colSpan={1} className="px-1 py-1">
+                <div className="flex h-8 items-center gap-2 rounded-md border border-gray-200 text-sm focus:border-sky-500 focus:outline-none">
+                  <div className="flex h-full items-center justify-center rounded-l-md bg-sky-100 px-2">
+                    <Search size={18} className="text-sky-800" />
+                  </div>
                   <input
                     type="search"
+                    aria-label="Filter documents by name"
                     placeholder="Filter by name..."
+                    value={nameFilter}
                     onChange={(e) => {
                       const filterValue = e.target.value;
                       setNameFilter(filterValue);
                     }}
-                    className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-sky-500 focus:outline-none"
+                    className=""
                   />
                 </div>
               </th>
@@ -221,10 +242,12 @@ function SortButton({
   field,
   direction,
   onSort,
+  ariaLabel: ariaLabel,
 }: {
   field: SortField;
   direction: SortDirection | null;
   onSort: (field: SortField) => void;
+  ariaLabel: string;
 }) {
   const inactiveClass =
     "bg-gray-50 text-gray-400 opacity-50  border-gray-500 hover:border-gray-800 hover:border-2";
@@ -232,6 +255,7 @@ function SortButton({
   console;
   return (
     <button
+      aria-label={ariaLabel}
       className={`flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border hover:border ${!direction ? inactiveClass : activeClass}`}
       onClick={() => onSort(field)}
     >
@@ -267,12 +291,20 @@ function FolderRow({
 }) {
   return (
     <tr
-      onClick={() => navigateToFolder([...route, folder.name])}
       className="h-10 cursor-pointer bg-amber-50 hover:bg-amber-100 focus:outline-2 focus:outline-gray-600"
       tabIndex={0}
+      onClick={() => navigateToFolder([...route, folder.name])}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigateToFolder([...route, folder.name]);
+        }
+      }}
+      role="button"
+      aria-label={`Open folder ${folder.name}`}
     >
       <td className="px-4">
-        <FolderIcon />
+        <FolderIcon aria-hidden="true" />
       </td>
       <td className="px-4">{folder.name}</td>
       <td className="px-4"></td>

@@ -1,4 +1,4 @@
-import DocumentTable from "./file-browser/FileTable";
+import DocumentTable from "./file-browser/DocumentTable";
 
 function App() {
   return (
