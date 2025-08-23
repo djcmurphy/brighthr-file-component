@@ -5,13 +5,11 @@ import userEvent from "@testing-library/user-event";
 import DocumentTable, { getInitialSort } from "../file-browser/DocumentTable";
 import { mockFiles, type Folder } from "../file-browser/mockData";
 
-vi.mock("dayjs", () => {
-  const dayjs = vi.importActual("dayjs");
-  const mockFormat = () => ({ format: () => `formatted-date` });
-
-  return { default: Object.assign(mockFormat, dayjs) };
-});
-
+vi.mock("dayjs", () => ({
+  default: () => ({
+    format: () => "formatted-date",
+  }),
+}));
 describe("DocumentTable", () => {
   let container: HTMLElement;
 
@@ -52,7 +50,6 @@ describe("DocumentTable", () => {
     it("navigates back to parent folder", async () => {
       const user = userEvent.setup();
 
-      // Navigate into a folder first
       const folderToClick = mockFiles.find(
         (f) => f.name === "Expenses",
       ) as Folder;
@@ -60,17 +57,33 @@ describe("DocumentTable", () => {
         screen.getByLabelText(`Open folder ${folderToClick.name}`),
       );
 
-      // Verify we're in the folder
       expect(screen.getByText(folderToClick.files[0].name)).toBeInTheDocument();
 
-      // Navigate back
       await user.click(screen.getByLabelText("Navigate back to root folder"));
 
-      // Verify we're back to root
       expect(screen.getByText("Employee Handbook")).toBeInTheDocument();
       expect(
         screen.queryByText(folderToClick.files[0].name),
       ).not.toBeInTheDocument();
+    });
+    it("resets filter when entering a folder", async () => {
+      const user = userEvent.setup();
+
+      const folderToClick = mockFiles.find(
+        (f) => f.type === "folder",
+      ) as Folder;
+      await user.click(
+        screen.getByLabelText(`Open folder ${folderToClick.name}`),
+      );
+      await user.type(
+        screen.getByLabelText("Filter documents by name"),
+        "test",
+      );
+      expect(screen.getByLabelText("Filter documents by name")).toHaveValue(
+        "test",
+      );
+      await user.click(screen.getByLabelText("Navigate back to root folder"));
+      expect(screen.getByLabelText("Filter documents by name")).toHaveValue("");
     });
   });
 
@@ -97,6 +110,13 @@ describe("DocumentTable", () => {
 
       await user.click(nameSortButton);
       expect(getVisibleNames()).toEqual(defaultSortedNames);
+    });
+    it("sorts by date correctly", async () => {
+      const user = userEvent.setup();
+      const dateSortButton = screen.getByLabelText(/Sort by date added/);
+
+      await user.click(dateSortButton);
+      await user.click(dateSortButton);
     });
   });
 
@@ -137,7 +157,6 @@ describe("DocumentTable", () => {
       const user = userEvent.setup();
       const filterInput = screen.getByLabelText("Filter documents by name");
 
-      // Navigate into a folder first
       const folderToClick = mockFiles.find(
         (f) => f.name === "Expenses",
       ) as Folder;
@@ -145,9 +164,8 @@ describe("DocumentTable", () => {
         screen.getByLabelText(`Open folder ${folderToClick.name}`),
       );
 
-      // Now filter within the folder - use a term that matches one of the files
       const fileToFind = folderToClick.files[0];
-      const searchTerm = fileToFind.name.split(" ")[0]; // Use first word of filename
+      const searchTerm = fileToFind.name.split(" ")[0];
       await user.type(filterInput, searchTerm);
 
       const visibleNames = getVisibleNames();
