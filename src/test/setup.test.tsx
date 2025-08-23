@@ -59,7 +59,7 @@ describe("DocumentTable", () => {
 
       expect(screen.getByText(folderToClick.files[0].name)).toBeInTheDocument();
 
-      await user.click(screen.getByLabelText("Navigate back to root folder"));
+      await user.click(screen.getByLabelText("Navigate up a level"));
 
       expect(screen.getByText("Employee Handbook")).toBeInTheDocument();
       expect(
@@ -82,15 +82,25 @@ describe("DocumentTable", () => {
       expect(screen.getByLabelText("Filter documents by name")).toHaveValue(
         "test",
       );
-      await user.click(screen.getByLabelText("Navigate back to root folder"));
+      await user.click(screen.getByLabelText("Navigate up a level"));
       expect(screen.getByLabelText("Filter documents by name")).toHaveValue("");
     });
   });
 
   describe("Sorting", () => {
+    it("has correct sort button state", async () => {
+      const user = userEvent.setup();
+      const filterInput = screen.getByLabelText(/^Sort by name button/);
+      await user.click(filterInput);
+      expect(filterInput).toHaveValue("asc");
+      await user.click(filterInput);
+      expect(filterInput).toHaveValue("desc");
+      await user.click(filterInput);
+      expect(filterInput).toHaveValue("inactive");
+    });
     it("cycles through sort states", async () => {
       const user = userEvent.setup();
-      const nameSortButton = screen.getByLabelText(/Sort by name/);
+      const nameSortButton = screen.getByLabelText(/^Sort by name button/);
 
       const defaultSortedNames = getInitialSort([...mockFiles]).map(
         (f) => f.name,
@@ -103,6 +113,7 @@ describe("DocumentTable", () => {
       expect(getVisibleNames()).toEqual(defaultSortedNames);
 
       await user.click(nameSortButton);
+
       expect(getVisibleNames()).toEqual(ascSortedNames);
 
       await user.click(nameSortButton);
@@ -177,7 +188,7 @@ describe("DocumentTable", () => {
     it("applies both a filter and a sort correctly", async () => {
       const user = userEvent.setup();
       const filterInput = screen.getByLabelText("Filter documents by name");
-      const nameSortButton = screen.getByLabelText(/Sort by name/);
+      const nameSortButton = screen.getByLabelText(/^Sort by name button/);
       const searchTerm = "e";
 
       await user.type(filterInput, searchTerm);

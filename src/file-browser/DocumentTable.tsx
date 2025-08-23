@@ -151,7 +151,7 @@ export default function DocumentTable() {
                         : null
                     }
                     sortByField={sortByField}
-                    ariaLabel={`Sort by name. Currently ${
+                    ariaLabel={`Sort by name button. Currently ${
                       currentSort.field === "name"
                         ? currentSort.direction === "asc"
                           ? "sorted ascending"
@@ -172,7 +172,7 @@ export default function DocumentTable() {
                         : null
                     }
                     sortByField={sortByField}
-                    ariaLabel={`Sort by date added. Currently ${
+                    ariaLabel={`Sort by date added button. Currently ${
                       currentSort.field === "added"
                         ? currentSort.direction === "asc"
                           ? "sorted ascending"
@@ -184,26 +184,28 @@ export default function DocumentTable() {
               </th>
             </tr>
             <tr>
-              <th className="h-12 w-20 max-w-20 min-w-20">
-                {route.length > 0 ? (
-                  <button
-                    onClick={() =>
-                      navigateToFolder(route.slice(0, route.length - 1))
-                    }
-                    aria-label="Navigate back to root folder"
-                    className="flex h-8 w-full cursor-pointer items-center gap-2 rounded-md bg-sky-100 px-2 py-1 text-sm text-sky-600 hover:text-gray-700"
-                  >
-                    <ChevronLeft size={16} />
-                    Back
-                  </button>
-                ) : (
-                  <></>
-                )}
+              <th className="h-12 w-20 max-w-20 min-w-20 transition-all">
+                <div
+                  className={`transition-opacity duration-200 ${route.length > 0 ? "opacity-100" : "opacity-0"}`}
+                >
+                  {route.length > 0 && (
+                    <button
+                      onClick={() =>
+                        navigateToFolder(route.slice(0, route.length - 1))
+                      }
+                      aria-label="Navigate up a level"
+                      className="flex h-8 w-full cursor-pointer items-center gap-2 rounded-md border border-sky-100 bg-sky-50 px-2 py-1 text-sm text-sky-600 hover:text-gray-700"
+                    >
+                      <ChevronLeft size={16} />
+                      Back
+                    </button>
+                  )}
+                </div>
               </th>
               <th colSpan={1} className="px-1 py-1">
                 <div className="flex h-8 items-center gap-2 rounded-md border border-gray-200 text-sm focus:border-sky-500 focus:outline-none">
-                  <div className="flex h-full items-center justify-center rounded-l-md bg-sky-100 px-2">
-                    <Search size={18} className="text-sky-800" />
+                  <div className="flex h-full items-center justify-center rounded-l-md bg-sky-50 px-2">
+                    <Search size={18} className="text-sky-600" />
                   </div>
                   <input
                     type="search"
@@ -258,15 +260,17 @@ function SortButton({
   return (
     <button
       aria-label={ariaLabel}
+      tabIndex={0}
+      value={direction || "inactive"}
       className={`flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border hover:border ${!direction ? inactiveClass : activeClass}`}
       onClick={() => sortByField(field)}
     >
       {!direction ? (
         <ArrowUpDown size={14} />
       ) : direction === "asc" ? (
-        <ArrowUp size={16} strokeWidth={4} />
-      ) : (
         <ArrowDown size={16} strokeWidth={4} />
+      ) : (
+        <ArrowUp size={16} strokeWidth={4} />
       )}
     </button>
   );
