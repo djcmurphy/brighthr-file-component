@@ -20,7 +20,7 @@ npm test
 
 ### Navigation
 
-**Breadcrumb Navigation**: Given the ambiguity around the depth of the file data, I made the assumption that it could possibly be deeply nested. I've added a breadcrumb trail in the header to show the current path and allow quick navigation back to parent folders. For deeply nested paths, the breadcrumb would need enhancement to handle overflow - either by truncating middle segments with ellipsis (e.g., "Documents / ... / CurrentFolder") or collapsing folders into a dropdown menu. The breadcrumb could also be made editable to allow users to type and jump directly to a desired folder, although this would probably require it to be remvoed form the header into an input field.
+**Breadcrumb Navigation**: Given the ambiguity around the depth of the file data, I made the assumption that it could possibly be deeply nested. I've added a breadcrumb trail in the header to show the current path and allow quick navigation back to parent folders. For deeply nested paths, the breadcrumb would need enhancement to handle overflow - either by truncating middle segments with ellipsis (e.g., "Documents / ... / CurrentFolder") or collapsing folders into a dropdown menu. The breadcrumb could also be made editable to allow users to type and jump directly to a desired folder, although this would probably require it to be remvoed from the header into an input field.
 
 ### File Types & Icons
 
@@ -29,7 +29,7 @@ npm test
 
 ### File Actions
 
-- **Action Dropdown/Pane**: Files would need a dropdown action button or a details pane to show file metadata and provide actions like download, delete, rename, or share.
+- **Action Dropdown/Pane**: In a real world setting files would probably have a dropdown action button or a details pane to show file metadata and provide actions like download, delete, etc.
 
 ### Performance & Data Management
 
@@ -40,8 +40,6 @@ npm test
 
 ### Responsiveness & Mobile Support
 
-- **Mobile Breakpoints**: The table has a fixed 600px minimum width that causes horizontal scrolling on phones. We'd need to implement responsive breakpoints and adjust the layout based on screen size.
+- **Touch Target Optimization**: Sort buttons could be enlarged from current 24x24px to 44x44px minimum for better mobile usability.
 
-- **Touch Optimization**: Current touch targets like the sort buttons are too small (24x24px) for mobile use. We'd need to increase these to at least 40x40px and replace hover states with touch-friendly interactions.
-
-- **Responsive Table Layout**: On mobile, we could keep the table but collapse all the information into a single cell per row. Each row would stack the file name, type, and date vertically within one `<td>`, maintaining the table structure while fitting narrow screens.
+- **Text Sizing**: Add responsive text sizing and padding/spacing to better utilize screen real estate across different device sizes.
