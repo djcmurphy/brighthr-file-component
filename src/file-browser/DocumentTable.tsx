@@ -28,14 +28,6 @@ export const getInitialSort = (files: FileOrFolder[]): FileOrFolder[] => {
 };
 
 export default function DocumentTable() {
-  const initialSortedFiles = useRef<FileOrFolder[]>(
-    [...mockFiles].sort((a, b) => {
-      if (a.type === "folder" && b.type !== "folder") return -1;
-      if (a.type !== "folder" && b.type === "folder") return 1;
-      return a.name.localeCompare(b.name);
-    }),
-  );
-
   const [route, setRoute] = useState<string[]>([]);
   const [currentSort, setCurrentSort] = useState<{
     field: SortField | null;
@@ -44,8 +36,16 @@ export default function DocumentTable() {
 
   const [nameFilter, setNameFilter] = useState("");
 
+  const initialSortedFiles = useRef<FileOrFolder[]>(
+    [...mockFiles].sort((a, b) => {
+      if (a.type === "folder" && b.type !== "folder") return -1;
+      if (a.type !== "folder" && b.type === "folder") return 1;
+      return a.name.localeCompare(b.name);
+    }),
+  ).current;
+
   const files = useMemo(() => {
-    let currentLevel: FileOrFolder[] = initialSortedFiles.current;
+    let currentLevel: FileOrFolder[] = initialSortedFiles;
 
     //route logic
     if (route.length > 0) {
@@ -135,13 +135,40 @@ export default function DocumentTable() {
       </div>
       <div className="h-2" />
       <div className="p-2">
-        <table className="w-full" aria-label="Documents table">
+        <div className="flex items-center gap-2 border-b border-gray-300 bg-gray-50 p-2">
+          <div
+            className={`transition-opacity duration-200 ${route.length > 0 ? "opacity-100" : "pointer-events-none opacity-0"}`}
+          >
+            <button
+              onClick={() => navigateToFolder(route.slice(0, route.length - 1))}
+              aria-label="Navigate up a level"
+              className="flex h-8 cursor-pointer items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              <ChevronLeft size={16} />
+              Back
+            </button>
+          </div>
+          <div className="flex h-8 max-w-sm flex-1 items-center rounded-md border border-gray-300 bg-white text-sm focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500">
+            <div className="flex h-full items-center justify-center px-2">
+              <Search size={18} className="text-gray-400" />
+            </div>
+            <input
+              type="search"
+              aria-label="Filter documents by name"
+              placeholder="Filter by name..."
+              value={nameFilter}
+              onChange={(e) => setNameFilter(e.target.value)}
+              className="h-full w-full px-2 outline-none"
+            />
+          </div>
+        </div>
+        <table className="w-[600px] table-fixed" aria-label="Documents table">
           <thead>
             <tr className="h-12 border-b border-sky-600">
-              <th scope="col" className="max-w-10 min-w-10">
+              <th scope="col" className="w-[13%]">
                 <div className="flex items-center gap-2 pl-4">Type</div>
               </th>
-              <th scope="col">
+              <th scope="col" className="w-[67%]">
                 <div className="flex items-center gap-2 pl-4">
                   Name
                   <SortButton
@@ -162,7 +189,7 @@ export default function DocumentTable() {
                   />
                 </div>
               </th>
-              <th scope="col">
+              <th scope="col" className="w-[20%]">
                 <div className="flex items-center gap-2 pl-4">
                   Added
                   <SortButton
@@ -184,57 +211,27 @@ export default function DocumentTable() {
                 </div>
               </th>
             </tr>
-            <tr>
-              <th className="h-12 w-20 max-w-20 min-w-20 transition-all">
-                <div
-                  className={`transition-opacity duration-200 ${route.length > 0 ? "opacity-100" : "opacity-0"}`}
-                >
-                  {route.length > 0 && (
-                    <button
-                      onClick={() =>
-                        navigateToFolder(route.slice(0, route.length - 1))
-                      }
-                      aria-label="Navigate up a level"
-                      className="flex h-8 w-full cursor-pointer items-center gap-2 rounded-md border border-sky-100 bg-sky-50 px-2 py-1 text-sm text-sky-600 hover:text-gray-700"
-                    >
-                      <ChevronLeft size={16} />
-                      Back
-                    </button>
-                  )}
-                </div>
-              </th>
-              <th colSpan={1} className="px-1 py-1">
-                <div className="flex h-8 items-center gap-2 rounded-md border border-gray-200 text-sm focus:border-sky-500 focus:outline-none">
-                  <div className="flex h-full items-center justify-center rounded-l-md bg-sky-50 px-2">
-                    <Search size={18} className="text-sky-600" />
-                  </div>
-                  <input
-                    type="search"
-                    aria-label="Filter documents by name"
-                    placeholder="Filter by name..."
-                    value={nameFilter}
-                    onChange={(e) => {
-                      const filterValue = e.target.value;
-                      setNameFilter(filterValue);
-                    }}
-                    className=""
-                  />
-                </div>
-              </th>
-            </tr>
           </thead>
           <tbody className="divide-y divide-gray-300">
-            {files.map((fileOrFolder) =>
-              fileOrFolder.type === "folder" ? (
-                <FolderRow
-                  key={fileOrFolder.name}
-                  folder={fileOrFolder}
-                  navigateToFolder={navigateToFolder}
-                  route={route}
-                />
-              ) : (
-                <FileRow key={fileOrFolder.name} file={fileOrFolder} />
-              ),
+            {files.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="px-4 py-8 text-center text-gray-500">
+                  No files found
+                </td>
+              </tr>
+            ) : (
+              files.map((fileOrFolder) =>
+                fileOrFolder.type === "folder" ? (
+                  <FolderRow
+                    key={fileOrFolder.name}
+                    folder={fileOrFolder}
+                    navigateToFolder={navigateToFolder}
+                    route={route}
+                  />
+                ) : (
+                  <FileRow key={fileOrFolder.name} file={fileOrFolder} />
+                ),
+              )
             )}
           </tbody>
         </table>
@@ -353,7 +350,7 @@ function FolderRow({
       aria-label={`Open folder ${folder.name}`}
     >
       <td className="px-4">
-        <FolderIcon aria-hidden="true" />
+        <FolderIcon aria-hidden="true" className="text-amber-500" />
       </td>
       <td className="px-4 underline">{folder.name}</td>
       <td className="px-4"></td>
