@@ -17,7 +17,11 @@ import {
 import dayjs from "dayjs";
 
 export type SortField = "type" | "name" | "added";
-export type SortDirection = "asc" | "desc" | "inactive";
+export type SortDirection = "asc" | "desc";
+type SortState = {
+  field: SortField;
+  direction: "asc" | "desc";
+} | null;
 
 export const getInitialSort = (files: FileOrFolder[]): FileOrFolder[] => {
   return [...files].sort((a, b) => {
@@ -29,10 +33,7 @@ export const getInitialSort = (files: FileOrFolder[]): FileOrFolder[] => {
 
 export default function DocumentTable() {
   const [route, setRoute] = useState<string[]>([]);
-  const [currentSort, setCurrentSort] = useState<{
-    field: SortField | null;
-    direction: SortDirection;
-  }>({ field: null, direction: "asc" });
+  const [currentSort, setCurrentSort] = useState<SortState>(null);
 
   const [nameFilter, setNameFilter] = useState("");
 
@@ -69,9 +70,9 @@ export default function DocumentTable() {
     }
 
     //sorting logic
-    if (currentSort.field && currentSort.direction !== "inactive") {
+    if (currentSort) {
       return [...filteredFiles].sort((a, b) => {
-        const field = currentSort.field!;
+        const field = currentSort.field;
         const direction = currentSort.direction;
 
         const aValue =
@@ -106,36 +107,28 @@ export default function DocumentTable() {
 
   const navigateToFolder = (folderPath: string[]) => {
     setRoute(folderPath);
-    setCurrentSort({ field: null, direction: "inactive" });
+    setCurrentSort(null);
     setNameFilter("");
   };
-
   const sortByField = (field: SortField) => {
-    let newDirection: SortDirection = "asc";
-    if (currentSort.field === field) {
-      if (currentSort.direction === "asc") {
-        newDirection = "desc";
-      } else if (currentSort.direction === "desc") {
-        newDirection = "inactive";
-      } else {
-        newDirection = "asc";
-      }
+    if (!currentSort || currentSort.field !== field) {
+      setCurrentSort({ field, direction: "asc" });
+    } else if (currentSort?.direction === "asc") {
+      setCurrentSort({ field, direction: "desc" });
+    } else {
+      setCurrentSort(null);
     }
-    setCurrentSort({
-      field: newDirection === "inactive" ? null : field,
-      direction: newDirection,
-    });
   };
 
   return (
-    <div className="min-h-[400px] min-w-[600px] rounded-md border-1 border-sky-600">
+    <div className="relative min-h-[400px] max-w-2xl rounded-md border-1 border-sky-600">
       <div className="flex h-12 items-center gap-2 overflow-x-auto bg-sky-500 px-4 text-white">
         <FileStack aria-hidden="true" />
         <Breadcrumbs route={route} navigateToFolder={navigateToFolder} />
       </div>
       <div className="h-2" />
       <div className="p-2">
-        <div className="flex items-center gap-2 border-b border-gray-300 bg-gray-50 p-2">
+        <div className="flex items-center gap-2 border-b border-gray-300 bg-gray-50 py-2">
           <div
             className={`transition-opacity duration-200 ${route.length > 0 ? "opacity-100" : "pointer-events-none opacity-0"}`}
           >
@@ -162,79 +155,87 @@ export default function DocumentTable() {
             />
           </div>
         </div>
-        <table className="w-[600px] table-fixed" aria-label="Documents table">
-          <thead>
-            <tr className="h-12 border-b border-sky-600">
-              <th scope="col" className="w-[13%]">
-                <div className="flex items-center gap-2 pl-4">Type</div>
-              </th>
-              <th scope="col" className="w-[67%]">
-                <div className="flex items-center gap-2 pl-4">
-                  Name
-                  <SortButton
-                    field="name"
-                    direction={
-                      currentSort.field === "name"
-                        ? currentSort.direction
-                        : null
-                    }
-                    sortByField={sortByField}
-                    ariaLabel={`Sort by name button. Currently ${
-                      currentSort.field === "name"
-                        ? currentSort.direction === "asc"
-                          ? "sorted ascending"
-                          : "sorted descending"
-                        : "not sorted"
-                    }`}
-                  />
-                </div>
-              </th>
-              <th scope="col" className="w-[20%]">
-                <div className="flex items-center gap-2 pl-4">
-                  Added
-                  <SortButton
-                    field="added"
-                    direction={
-                      currentSort.field === "added"
-                        ? currentSort.direction
-                        : null
-                    }
-                    sortByField={sortByField}
-                    ariaLabel={`Sort by date added button. Currently ${
-                      currentSort.field === "added"
-                        ? currentSort.direction === "asc"
-                          ? "sorted ascending"
-                          : "sorted descending"
-                        : "not sorted"
-                    }`}
-                  />
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-300">
-            {files.length === 0 ? (
-              <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-gray-500">
-                  No files found
-                </td>
+        <div className="overflow-x-auto">
+          <table
+            className="w-full min-w-[300px] table-fixed"
+            aria-label="Documents table"
+          >
+            <thead>
+              <tr className="h-12 border-b border-sky-600">
+                <th scope="col" className="w-[13%]">
+                  <div className="flex items-center gap-2 pl-4">Type</div>
+                </th>
+                <th scope="col" className="w-[62%]">
+                  <div className="flex items-center gap-2 pl-4">
+                    Name
+                    <SortButton
+                      field="name"
+                      direction={
+                        currentSort?.field === "name"
+                          ? currentSort.direction
+                          : null
+                      }
+                      sortByField={sortByField}
+                      ariaLabel={`Sort by name button. Currently ${
+                        currentSort?.field === "name"
+                          ? currentSort.direction === "asc"
+                            ? "sorted ascending"
+                            : "sorted descending"
+                          : "not sorted"
+                      }`}
+                    />
+                  </div>
+                </th>
+                <th scope="col" className="min-w-[25% w-[25%]">
+                  <div className="flex items-center gap-2 pl-4">
+                    Added
+                    <SortButton
+                      field="added"
+                      direction={
+                        currentSort?.field === "added"
+                          ? currentSort.direction
+                          : null
+                      }
+                      sortByField={sortByField}
+                      ariaLabel={`Sort by date added button. Currently ${
+                        currentSort?.field === "added"
+                          ? currentSort.direction === "asc"
+                            ? "sorted ascending"
+                            : "sorted descending"
+                          : "not sorted"
+                      }`}
+                    />
+                  </div>
+                </th>
               </tr>
-            ) : (
-              files.map((fileOrFolder) =>
-                fileOrFolder.type === "folder" ? (
-                  <FolderRow
-                    key={fileOrFolder.name}
-                    folder={fileOrFolder}
-                    navigateToFolder={navigateToFolder}
-                    route={route}
-                  />
-                ) : (
-                  <FileRow key={fileOrFolder.name} file={fileOrFolder} />
-                ),
-              )
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-300">
+              {files.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    No files found
+                  </td>
+                </tr>
+              ) : (
+                files.map((fileOrFolder) =>
+                  fileOrFolder.type === "folder" ? (
+                    <FolderRow
+                      key={fileOrFolder.name}
+                      folder={fileOrFolder}
+                      navigateToFolder={navigateToFolder}
+                      route={route}
+                    />
+                  ) : (
+                    <FileRow key={fileOrFolder.name} file={fileOrFolder} />
+                  ),
+                )
+              )}
+            </tbody>
+          </table>{" "}
+        </div>
       </div>
     </div>
   );
@@ -301,7 +302,7 @@ function SortButton({
     <button
       aria-label={ariaLabel}
       tabIndex={0}
-      value={direction || "inactive"}
+      data-test-value={direction || "null"}
       className={`flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border hover:border ${!direction ? inactiveClass : activeClass}`}
       onClick={() => sortByField(field)}
     >
@@ -320,7 +321,7 @@ function FileRow({ file }: { file: FileItem }) {
   return (
     <tr className="h-10">
       <td className="px-4">{file.type}</td>
-      <td className="px-4">{file.name}</td>
+      <td className="px-4 underline">{file.name}</td>
       <td className="px-4">{dayjs(file.added).format("DD/MM/YYYY")}</td>
     </tr>
   );

@@ -92,11 +92,11 @@ describe("DocumentTable", () => {
       const user = userEvent.setup();
       const filterInput = screen.getByLabelText(/^Sort by name button/);
       await user.click(filterInput);
-      expect(filterInput).toHaveValue("asc");
+      expect(filterInput).toHaveAttribute("data-test-value", "asc");
       await user.click(filterInput);
-      expect(filterInput).toHaveValue("desc");
+      expect(filterInput).toHaveAttribute("data-test-value", "desc");
       await user.click(filterInput);
-      expect(filterInput).toHaveValue("inactive");
+      expect(filterInput).toHaveAttribute("data-test-value", "null");
     });
     it("cycles through sort states", async () => {
       const user = userEvent.setup();
