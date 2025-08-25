@@ -38,4 +38,4 @@ npm test
 
 - **Touch Target Optimization**: Sort buttons could be enlarged from current 24x24px to 44x44px minimum for better mobile usability.
 
-- **Text Sizing**: Add responsive text sizing and padding/spacing to better utilize screen real estate across different device sizes.
+- **Mobile Layout**: The current two-column design (Type/Name) could work on mobile with minor adjustments. If we needed to add more columns or functionality in the future, we would likely have to change it. Could potentially move to a single column card-based layout or use swipe to show more info.
