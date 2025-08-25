@@ -27,10 +27,6 @@ npm test
 - **Dynamic File Type Support**: The current implementation has a limited set of file types. We would need to liaise with the backend team to get a comprehensive list of all supported file types and their associated metadata.
 - **Custom Icons**: Implement custom icons for different file types to improve visual recognition and user experience.
 
-### File Actions
-
-- **Action Dropdown/Pane**: In a real world setting files would probably have a dropdown action button or a details pane to show file metadata and provide actions like download, delete, etc.
-
 ### Performance & Data Management
 
 - **Pagination**: For large file lists we would need pagination.
