@@ -16,8 +16,8 @@ import {
 } from "lucide-react";
 import dayjs from "dayjs";
 
-export type SortField = "type" | "name" | "added";
-export type SortDirection = "asc" | "desc";
+type SortField = "type" | "name" | "added";
+type SortDirection = "asc" | "desc";
 type SortState = {
   field: SortField;
   direction: "asc" | "desc";
@@ -321,7 +321,7 @@ function FileRow({ file }: { file: FileItem }) {
   return (
     <tr className="h-10">
       <td className="px-4">{file.type}</td>
-      <td className="px-4 underline">{file.name}</td>
+      <td className="px-4">{file.name}</td>
       <td className="px-4">{dayjs(file.added).format("DD/MM/YYYY")}</td>
     </tr>
   );

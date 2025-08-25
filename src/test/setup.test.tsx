@@ -66,6 +66,7 @@ describe("DocumentTable", () => {
         screen.queryByText(folderToClick.files[0].name),
       ).not.toBeInTheDocument();
     });
+
     it("resets filter when entering a folder", async () => {
       const user = userEvent.setup();
 
@@ -88,6 +89,26 @@ describe("DocumentTable", () => {
   });
 
   describe("Sorting", () => {
+    it("resets sort when entering a folder", async () => {
+      const user = userEvent.setup();
+
+      // Apply a sort
+      await user.click(screen.getByLabelText(/^Sort by name button/));
+      expect(screen.getByLabelText(/^Sort by name button/)).toHaveAttribute(
+        "data-test-value",
+        "asc",
+      );
+
+      // Enter folder
+      const folder = mockFiles.find((f) => f.type === "folder");
+      await user.click(screen.getByLabelText(`Open folder ${folder?.name}`));
+
+      // Check sort is reset
+      expect(screen.getByLabelText(/^Sort by name button/)).toHaveAttribute(
+        "data-test-value",
+        "null",
+      );
+    });
     it("has correct sort button state", async () => {
       const user = userEvent.setup();
       const filterInput = screen.getByLabelText(/^Sort by name button/);
