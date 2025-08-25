@@ -265,12 +265,6 @@ function Breadcrumbs({
             <span aria-hidden="true">/</span>
             <button
               onClick={() => navigateToFolder(route.slice(0, index + 1))}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  navigateToFolder(route.slice(0, index + 1));
-                }
-              }}
               className="cursor-pointer px-1 hover:underline focus-visible:rounded focus-visible:outline-2 focus-visible:outline-white"
               aria-label={`Navigate to ${folder} folder`}
               aria-current={index === route.length - 1 ? "page" : undefined}
@@ -343,7 +337,6 @@ function FolderRow({
       onClick={() => navigateToFolder([...route, folder.name])}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
           navigateToFolder([...route, folder.name]);
         }
       }}
