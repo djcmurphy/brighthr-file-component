@@ -20,7 +20,7 @@ npm test
 
 ### Navigation
 
-**Breadcrumb Navigation**: Given the ambiguity around the depth of the file data, I made the assumption that it could possibly be deeply nested. I've added a breadcrumb trail in the header to show the current path and allow quick navigation back to parent folders. The breadcrumb could also be made editable to allow users to type and jump directly to a desired folder, although this would probably require it to be removed from the header into an input field.
+- **Breadcrumb Navigation**: Given the ambiguity around the depth of the file data, I made the assumption that it could possibly be deeply nested. I've added a breadcrumb trail in the header to show the current path and allow quick navigation back to parent folders. The breadcrumb could also be made editable to allow users to type and jump directly to a desired folder, although this would probably require it to be removed from the header into an input field.
 
 ### File Types & Icons
 
